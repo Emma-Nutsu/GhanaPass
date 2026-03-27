@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useRef, useEffect } from 'react';
 import GhanaCardInput from '../../../components/GhanaCardInput';
+import { API_BASE } from '../../../utils/api';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function RegisterPage() {
     setError('');
     setCitizen(null);
     try {
-      const res = await fetch(`/api/registry/lookup/${encodeURIComponent(form.ghana_card_number)}`);
+      const res = await fetch(`${API_BASE}/registry/lookup/${encodeURIComponent(form.ghana_card_number)}`);
       const data = await res.json();
       if (!res.ok || !data.found) {
         setError(data.error || 'Invalid Ghana Card Number. Cannot create account.');
@@ -59,7 +60,7 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)

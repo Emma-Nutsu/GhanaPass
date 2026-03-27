@@ -2,11 +2,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { 
-  Star, Home, FileText, Activity, Link2, 
-  Smartphone, Landmark, Key, X, LogOut, 
+import {
+  Star, Home, FileText, Activity, Link2,
+  Smartphone, Landmark, Key, X, LogOut,
   List, MapPin, Tablet, Laptop, Smartphone as Phone
 } from 'lucide-react';
+
+import { API_BASE } from '../../../utils/api';
 
 export default function ActivityPage() {
   const router = useRouter();
@@ -17,19 +19,19 @@ export default function ActivityPage() {
     const token = localStorage.getItem('gp_token');
     if (!token) { router.push('/auth/login'); return; }
 
-    fetch('/api/user/activity?limit=50', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/user/activity?limit=50`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => { setActivities(data.activities || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, [router]);
-  
+
   const handleLogout = () => {
     const token = localStorage.getItem('gp_token');
     if (token) {
-      fetch('/api/auth/logout', { 
-        method: 'POST', 
-        headers: { 'Authorization': `Bearer ${token}` } 
-      }).catch(() => {});
+      fetch(`${API_BASE}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).catch(() => { });
     }
     localStorage.removeItem('gp_token');
     localStorage.removeItem('gp_user');
@@ -37,10 +39,10 @@ export default function ActivityPage() {
   };
 
   const actionIcons = {
-    login: <Key size={18} color="white" />, 
-    login_failed: <X size={18} color="white" />, 
-    register: <FileText size={18} color="white" />, 
-    logout: <LogOut size={18} color="white" />, 
+    login: <Key size={18} color="white" />,
+    login_failed: <X size={18} color="white" />,
+    register: <FileText size={18} color="white" />,
+    logout: <LogOut size={18} color="white" />,
     default: <List size={18} color="white" />
   };
 

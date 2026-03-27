@@ -9,6 +9,8 @@ import {
   Check, X, LogOut
 } from 'lucide-react';
 
+import { API_BASE } from '../../../utils/api';
+
 export default function SIMVerificationPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -30,7 +32,7 @@ export default function SIMVerificationPage() {
     const storedUser = localStorage.getItem('gp_user');
     if (storedUser) setUser(JSON.parse(storedUser));
 
-    fetch('/api/user/profile', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/user/profile`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => { if (data.id) setUser(data); }).catch(() => {});
   }, [token, router]);
 
@@ -46,7 +48,7 @@ export default function SIMVerificationPage() {
     setLoading(true);
     setResult(null);
     try {
-      const res = await fetch('/api/sim/verify', {
+      const res = await fetch(`${API_BASE}/sim/verify`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -76,7 +78,7 @@ export default function SIMVerificationPage() {
 
   const handleLogout = () => {
     if (token) {
-      fetch('/api/auth/logout', { 
+      fetch(`${API_BASE}/auth/logout`, { 
         method: 'POST', 
         headers: { 'Authorization': `Bearer ${token}` } 
       }).catch(() => {});

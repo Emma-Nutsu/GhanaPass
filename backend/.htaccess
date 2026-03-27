@@ -1,0 +1,12 @@
+RewriteEngine On
+DirectoryIndex disabled
+RewriteRule ^$ http://127.0.0.1:5057/ [P,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ http://127.0.0.1:5057/$1 [P,L]
+
+
+<FilesMatch "\.(js|ts|env|json|ini|log|prisma|htaccess|mjs|gitignore)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

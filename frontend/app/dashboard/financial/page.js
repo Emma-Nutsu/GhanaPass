@@ -9,6 +9,8 @@ import {
   ShieldCheck
 } from 'lucide-react';
 
+import { API_BASE } from '../../../utils/api';
+
 export default function FinancialServicesPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -33,7 +35,7 @@ export default function FinancialServicesPage() {
     const storedUser = localStorage.getItem('gp_user');
     if (storedUser) setUser(JSON.parse(storedUser));
 
-    fetch('/api/user/profile', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/user/profile`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => { if (data.id) setUser(data); }).catch(() => { });
 
     fetchBanks();
@@ -41,18 +43,18 @@ export default function FinancialServicesPage() {
   }, [token, router]);
 
   const fetchBanks = () => {
-    fetch('/api/financial/banks', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/financial/banks`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => setBanks(data.banks || [])).catch(() => { });
   };
 
   const fetchAccounts = () => {
-    fetch('/api/financial/accounts', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/financial/accounts`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => setAccounts(data.accounts || [])).catch(() => { });
   };
 
   const handleLogout = () => {
     if (token) {
-      fetch('/api/auth/logout', {
+      fetch(`${API_BASE}/auth/logout`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       }).catch(() => { });
@@ -80,7 +82,7 @@ export default function FinancialServicesPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('/api/financial/open-account', {
+      const res = await fetch(`${API_BASE}/financial/open-account`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ bank_id: selectedBank.id, ...form })

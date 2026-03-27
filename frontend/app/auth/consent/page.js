@@ -9,6 +9,8 @@ import {
   ArrowRight, User, Phone, FileText, Fingerprint
 } from 'lucide-react';
 
+import { API_BASE } from '../../../utils/api';
+
 function ConsentContent() {
   const searchParams = useSearchParams();
   const [client, setClient] = useState(null);
@@ -21,7 +23,7 @@ function ConsentContent() {
     const state = searchParams.get('state');
 
     if (clientId) {
-      fetch(`/api/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri || '')}&response_type=code&scope=${scope || 'openid profile'}&state=${state || ''}`)
+      fetch(`${API_BASE}/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri || '')}&response_type=code&scope=${scope || 'openid profile'}&state=${state || ''}`)
         .then(res => res.json())
         .then(data => { setClient(data); setLoading(false); })
         .catch(() => setLoading(false));
@@ -39,7 +41,7 @@ function ConsentContent() {
 
   const handleConsent = async (approved) => {
     const token = localStorage.getItem('gp_token');
-    const res = await fetch('/api/oauth/authorize', {
+    const res = await fetch(`${API_BASE}/oauth/authorize`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({

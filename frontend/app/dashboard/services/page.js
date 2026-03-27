@@ -8,6 +8,8 @@ import {
   Trash2, Plus, Info, Shield, CheckCircle, LogOut
 } from 'lucide-react';
 
+import { API_BASE } from '../../../utils/api';
+
 export default function ServicesPage() {
   const router = useRouter();
   const [consents, setConsents] = useState([]);
@@ -22,7 +24,7 @@ export default function ServicesPage() {
   }, [token, router]);
 
   const fetchConsents = () => {
-    fetch('/api/user/consents', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/user/consents`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => { setConsents(data.consents || []); setLoading(false); })
       .catch(() => setLoading(false));
@@ -30,7 +32,7 @@ export default function ServicesPage() {
 
   const revokeConsent = async (id) => {
     try {
-      const res = await fetch(`/api/user/consents/${id}`, {
+      const res = await fetch(`${API_BASE}/user/consents/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -45,7 +47,7 @@ export default function ServicesPage() {
 
   const handleLogout = () => {
     if (token) {
-      fetch('/api/auth/logout', { 
+      fetch(`${API_BASE}/auth/logout`, { 
         method: 'POST', 
         headers: { 'Authorization': `Bearer ${token}` } 
       }).catch(() => {});

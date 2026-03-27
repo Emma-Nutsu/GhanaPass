@@ -9,6 +9,8 @@ import {
   FileBadge, CheckCircle, LogOut
 } from 'lucide-react';
 
+import { API_BASE } from '../../../utils/api';
+
 export default function DocumentsPage() {
   const router = useRouter();
   const [documents, setDocuments] = useState([]);
@@ -26,13 +28,13 @@ export default function DocumentsPage() {
   }, [token, router]);
 
   const fetchDocuments = () => {
-    fetch('/api/documents', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/documents`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => setDocuments(data.documents || [])).catch(() => {});
   };
 
   const handleLogout = () => {
     if (token) {
-      fetch('/api/auth/logout', { 
+      fetch(`${API_BASE}/auth/logout`, { 
         method: 'POST', 
         headers: { 'Authorization': `Bearer ${token}` } 
       }).catch(() => {});
@@ -49,7 +51,7 @@ export default function DocumentsPage() {
     const formData = new FormData();
     formData.append('document', file);
     try {
-      const res = await fetch('/api/documents/upload', {
+      const res = await fetch(`${API_BASE}/documents/upload`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
@@ -68,7 +70,7 @@ export default function DocumentsPage() {
   const handleSign = async (docId) => {
     setSigning(true);
     try {
-      const res = await fetch('/api/documents/sign', {
+      const res = await fetch(`${API_BASE}/documents/sign`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ document_id: docId, pin })

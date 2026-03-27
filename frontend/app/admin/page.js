@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import nextDynamic from 'next/dynamic';
 import { Users, CheckCircle, Clock, Flag, Key, FileText, ExternalLink, AlertTriangle, BarChart3, List, Map as MapIcon, ShieldAlert, Plug, Home, Terminal, LogOut, Search, Check, X, Info, Eye, ShieldCheck, Activity, Globe } from 'lucide-react';
 
+import { API_BASE } from '../../utils/api';
+
 const GhanaActivityMap = nextDynamic(() => import('../../components/GhanaActivityMap'), { ssr: false });
 
 export default function AdminDashboard() {
@@ -25,15 +27,15 @@ export default function AdminDashboard() {
   }, [token, router]);
 
   const fetchAll = () => {
-    fetch('/api/admin/stats', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/admin/stats`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => setStats(data)).catch(() => { });
     fetchUsers();
-    fetch('/api/admin/fraud', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/admin/fraud`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => setFraudAlerts(data.alerts || [])).catch(() => { });
   };
 
   const fetchUsers = (s, st) => {
-    let url = '/api/admin/users?limit=50';
+    let url = `${API_BASE}/admin/users?limit=50`;
     if (s || search) url += `&search=${encodeURIComponent(s || search)}`;
     if (st || statusFilter) url += `&status=${st || statusFilter}`;
     fetch(url, { headers: { 'Authorization': `Bearer ${token}` } })
@@ -42,7 +44,7 @@ export default function AdminDashboard() {
 
   const updateUserStatus = async (userId, status) => {
     try {
-      await fetch(`/api/admin/users/${userId}/status`, {
+      await fetch(`${API_BASE}/admin/users/${userId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status })
@@ -56,7 +58,7 @@ export default function AdminDashboard() {
 
   const updateFraudAlert = async (alertId, status) => {
     try {
-      await fetch(`/api/admin/fraud/${alertId}`, {
+      await fetch(`${API_BASE}/admin/fraud/${alertId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status })
@@ -69,7 +71,7 @@ export default function AdminDashboard() {
   const handleLogout = () => {
     const token = localStorage.getItem('gp_token');
     if (token) {
-      fetch('/api/auth/logout', { 
+      fetch(`${API_BASE}/auth/logout`, { 
         method: 'POST', 
         headers: { 'Authorization': `Bearer ${token}` } 
       }).catch(() => {});
@@ -236,7 +238,7 @@ function ActivityFeedTab({ token }) {
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    let url = '/api/admin/activity-feed?limit=50';
+    let url = `${API_BASE}/admin/activity-feed?limit=50`;
     if (filter) url += `&type=${filter}`;
     fetch(url, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => setActivities(data.activities || [])).catch(() => { });
@@ -313,7 +315,7 @@ function ActivityMapTab({ token }) {
   const [selectedRegion, setSelectedRegion] = useState(null);
 
   useEffect(() => {
-    fetch('/api/admin/map-data', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/admin/map-data`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => setMapData(data)).catch(() => { });
   }, [token]);
 
@@ -385,7 +387,7 @@ function FraudTab({ token, fraudAlerts, updateFraudAlert, severityColors, users 
   const viewReport = async (userId) => {
     setLoadingReport(true);
     try {
-      const res = await fetch(`/api/admin/fraud-report/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(`${API_BASE}/admin/fraud-report/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
       const data = await res.json();
       setReport(data);
       setSelectedUser(userId);
@@ -602,7 +604,7 @@ function IntegrationsTab({ token }) {
   const [clients, setClients] = useState([]);
 
   useEffect(() => {
-    fetch('/api/admin/integrations', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/admin/integrations`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => setClients(data.clients || [])).catch(() => { });
   }, [token]);
 

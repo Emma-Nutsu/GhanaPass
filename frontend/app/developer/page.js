@@ -9,6 +9,8 @@ import {
   ArrowRight, Play, Info
 } from 'lucide-react';
 
+import { API_BASE } from '../../utils/api';
+
 export default function DeveloperPortal() {
   const [tab, setTab] = useState('docs');
   const [sandboxResult, setSandboxResult] = useState(null);
@@ -24,7 +26,12 @@ export default function DeveloperPortal() {
       if (token) options.headers['Authorization'] = `Bearer ${token}`;
       if (body) options.body = JSON.stringify(body);
 
-      const res = await fetch(endpoint, options);
+      // Prepend API_BASE and remove /api prefix from endpoint if present
+      const targetUrl = endpoint.startsWith('/api') 
+        ? `${API_BASE}${endpoint.substring(4)}` 
+        : `${API_BASE}${endpoint}`;
+
+      const res = await fetch(targetUrl, options);
       const data = await res.json();
       const duration = Date.now() - start;
 

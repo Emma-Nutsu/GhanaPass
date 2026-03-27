@@ -6,7 +6,7 @@ const path = require('path');
 const { initializeDatabase } = require('./db');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5057;
 
 // Initialize database
 initializeDatabase();
@@ -16,15 +16,15 @@ app.use('/demo', express.static(path.join(__dirname, '..', 'demo')));
 
 // Security middleware
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ 
-  origin: function(origin, callback) {
+app.use(cors({
+  origin: function (origin, callback) {
     // Allow requests with no origin (curl, mobile apps, etc.)
     if (!origin || origin === 'null') return callback(null, true);
-    const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5000'];
+    const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'https://ghanapass.adinkra-qrcode.com'];
     if (allowedOrigins.includes(origin)) return callback(null, true);
     callback(null, false);
-  }, 
-  credentials: true 
+  },
+  credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));

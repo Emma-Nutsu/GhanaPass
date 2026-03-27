@@ -2,13 +2,15 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { 
-  Key, User, Smartphone, Lock, 
+import {
+  Key, User, Smartphone, Lock,
   Fingerprint, ArrowRight, ArrowLeft, Camera,
   ShieldCheck, AlertCircle, RefreshCw, Smartphone as PhoneIcon
 } from 'lucide-react';
 import { useRef, useEffect } from 'react';
 import GhanaCardInput from '../../../components/GhanaCardInput';
+
+import { API_BASE } from '../../../utils/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,7 +45,7 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ghana_card_number: form.ghana_card_number, password: form.password })
@@ -69,8 +71,8 @@ export default function LoginPage() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error("Camera API not supported in this browser/context.");
       }
-      const s = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } 
+      const s = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
       });
       console.log("Camera stream obtained:", s.id);
       setStream(s);
@@ -111,7 +113,7 @@ export default function LoginPage() {
     setError('');
     setTimeout(async () => {
       try {
-        const res = await fetch('/api/auth/verify-face', {
+        const res = await fetch(`${API_BASE}/auth/verify-face`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ temp_token: tempToken })
@@ -132,7 +134,7 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/auth/otp/send', {
+      const res = await fetch(`${API_BASE}/auth/otp/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ghana_card_number: form.ghana_card_number })
@@ -155,7 +157,7 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/auth/otp/verify', {
+      const res = await fetch(`${API_BASE}/auth/otp/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ghana_card_number: form.ghana_card_number, code: form.otp })
@@ -183,7 +185,7 @@ export default function LoginPage() {
     setLoginStep('biometric_scan');
     setTimeout(async () => {
       try {
-        const res = await fetch('/api/auth/biometric', {
+        const res = await fetch(`${API_BASE}/auth/biometric`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ghana_card_number: form.ghana_card_number })
@@ -258,20 +260,20 @@ export default function LoginPage() {
                     <div style={{ color: 'var(--gold)', fontSize: '0.9rem', fontWeight: 700, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>VERIFYING...</div>
                   </div>
                 )}
-                
+
                 {/* Live Video Feed */}
-                <video 
-                  ref={videoRef} 
-                  autoPlay 
-                  playsInline 
-                  muted 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover', 
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
                     transform: 'scaleX(-1)',
-                    display: stream ? 'block' : 'none' 
-                  }} 
+                    display: stream ? 'block' : 'none'
+                  }}
                 />
 
                 {/* Initial Placeholder (Shown until stream connects) */}
@@ -301,12 +303,12 @@ export default function LoginPage() {
         {loginStep === 'biometric_scan' && (
           <div className="animate-fade-in" style={{ textAlign: 'center' }}>
             <div className="face-capture">
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}><Fingerprint size={64} color="var(--gold)" /></div>
-                  <div className="spinner" style={{ width: '32px', height: '32px', margin: '0 auto 12px', borderWidth: '3px' }}></div>
-                  <div style={{ color: 'var(--gold)', fontSize: '0.85rem', fontWeight: 600 }}>Scanning Biometrics...</div>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px' }}>Fingerprint + Iris verification</div>
-                </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}><Fingerprint size={64} color="var(--gold)" /></div>
+                <div className="spinner" style={{ width: '32px', height: '32px', margin: '0 auto 12px', borderWidth: '3px' }}></div>
+                <div style={{ color: 'var(--gold)', fontSize: '0.85rem', fontWeight: 600 }}>Scanning Biometrics...</div>
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px' }}>Fingerprint + Iris verification</div>
+              </div>
             </div>
           </div>
         )}
@@ -332,23 +334,23 @@ export default function LoginPage() {
               <form onSubmit={handlePasswordLogin}>
                 <div className="form-group">
                   <label className="form-label">Ghana Card Number</label>
-                  <GhanaCardInput 
+                  <GhanaCardInput
                     name="ghana_card_number"
                     value={form.ghana_card_number}
-                    onChange={val => setForm({ ...form, ghana_card_number: val })} 
-                    required 
+                    onChange={val => setForm({ ...form, ghana_card_number: val })}
+                    required
                   />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Password</label>
-                  <input 
-                    className="form-input" 
-                    type="password" 
+                  <input
+                    className="form-input"
+                    type="password"
                     name="password"
-                    placeholder="Enter your password" 
+                    placeholder="Enter your password"
                     value={form.password}
-                    onChange={e => setForm({ ...form, password: e.target.value })} 
-                    required 
+                    onChange={e => setForm({ ...form, password: e.target.value })}
+                    required
                   />
                 </div>
                 <button className="btn btn-primary btn-full btn-lg" type="submit" disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>

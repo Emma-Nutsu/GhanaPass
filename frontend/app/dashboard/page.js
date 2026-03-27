@@ -9,6 +9,8 @@ import {
   LayoutDashboard, CreditCard, ExternalLink
 } from 'lucide-react';
 
+import { API_BASE } from '../../utils/api';
+
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -21,19 +23,19 @@ export default function DashboardPage() {
     if (!token) { router.push('/auth/login'); return; }
     if (storedUser) setUser(JSON.parse(storedUser));
 
-    fetch('/api/user/profile', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/user/profile`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => { if (data.id) setUser(data); }).catch(() => { });
 
-    fetch('/api/user/activity?limit=5', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/user/activity?limit=5`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => setActivity(data.activities || [])).catch(() => { });
 
-    fetch('/api/user/consents', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE}/user/consents`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.json()).then(data => setConsents(data.consents || [])).catch(() => { });
   }, [router]);
 
   const handleLogout = () => {
     const token = localStorage.getItem('gp_token');
-    fetch('/api/auth/logout', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+    fetch(`${API_BASE}/auth/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
     localStorage.removeItem('gp_token');
     localStorage.removeItem('gp_user');
     router.push('/auth/login');

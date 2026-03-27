@@ -6,7 +6,8 @@ frontend/node_modules/
 # Next.js build output
 .next/
 frontend/.next/
-
+frontend/out/
+*.zip
 # Environment variables
 .env
 .env.local
