@@ -13,12 +13,18 @@ export default function GhanaActivityMap({ regions, livePoints, onRegionClick })
 
   useEffect(() => {
     if (mapInstanceRef.current || !mapRef.current) return;
+    let isMounted = true;
 
     // Dynamically import Leaflet
     Promise.all([
       import('leaflet'),
       import('leaflet/dist/leaflet.css')
     ]).then(([L]) => {
+      if (!isMounted || !mapRef.current) return;
+
+      // Ensure we don't initialize if a map already exists on this element
+      if (mapRef.current._leaflet_id) return;
+
       leafletRef.current = L;
       const map = L.map(mapRef.current, {
         center: [7.9528, -1.0307], // Ghana center
@@ -40,6 +46,7 @@ export default function GhanaActivityMap({ regions, livePoints, onRegionClick })
     });
 
     return () => {
+      isMounted = false;
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;

@@ -384,7 +384,7 @@ body {
 }
 
 .stat-label {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   color: var(--text-primary);
   margin-top: 4px;
   font-weight: 800;
@@ -393,7 +393,7 @@ body {
 }
 
 .stat-value {
-  font-size: 2.8rem;
+  font-size: 2.2rem;
   font-weight: 900;
   color: var(--gold);
   line-height: 1;
@@ -485,8 +485,8 @@ section p {
 
 .feature-card p {
   color: var(--text-secondary);
-  font-size: 1.1rem;
-  line-height: 1.8;
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 /* ========= FORMS ========= */
@@ -1488,6 +1488,7 @@ select.form-input {
   transform: translateY(-5px);
   box-shadow: 0 10px 40px rgba(212, 168, 67, 0.2);
 }
+
 .marquee-content-reverse {
   display: flex;
   gap: 3rem;
@@ -1500,6 +1501,199 @@ select.form-input {
 }
 
 @keyframes marquee-reverse {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(-50%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* ========= FINANCIAL MODAL & CARDS ========= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-container {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  width: 95%;
+  max-width: 1000px;
+  height: 85vh;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1100;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: var(--red-light);
+  border-color: var(--red-light);
+  transform: rotate(90deg);
+}
+
+.modal-left {
+  width: 350px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.modal-right {
+  flex: 1;
+  padding: 3rem;
+  overflow-y: auto;
+  background: radial-gradient(circle at top right, rgba(212, 168, 67, 0.05), transparent 40%);
+}
+
+.branch-list {
+  padding: 1.5rem;
+}
+
+.branch-item {
+  margin-bottom: 0.5rem;
+}
+
+.branch-header {
+  padding: 1rem;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.branch-header:hover {
+  border-color: var(--gold);
+  background: rgba(212, 168, 67, 0.05);
+}
+
+.branch-header.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #000;
+}
+
+.type-menu {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  animation: slideDown 0.2s ease;
+}
+
+.type-btn {
+  padding: 0.75rem 1rem;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  width: 100%;
+}
+
+.type-btn:hover {
+  border-color: var(--green-light);
+  background: rgba(0, 168, 107, 0.05);
+}
+
+.type-btn.selected {
+  background: rgba(0, 168, 107, 0.15);
+  border-color: var(--green-light);
+  color: var(--green-light);
+}
+
+.bank-card-white {
+  background: white !important;
+  color: #121214 !important;
+  border: none !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem !important;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.bank-card-white:hover {
+  transform: translateY(-8px) scale(1.02) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+.bank-card-white .bank-name {
+  color: #121214;
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { 
-  Landmark, Wallet, PieChart, Lock, CheckCircle, 
-  X, Home, FileText, Activity, Link2, Smartphone, 
+import {
+  Landmark, Wallet, PieChart, Lock, CheckCircle,
+  X, Home, FileText, Activity, Link2, Smartphone,
   Check, Info, CreditCard, Building2, Briefcase, LogOut,
   ShieldCheck
 } from 'lucide-react';
@@ -15,10 +15,11 @@ export default function FinancialServicesPage() {
   const [banks, setBanks] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [selectedBank, setSelectedBank] = useState(null);
-  const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [toast, setToast] = useState(null);
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [selectedType, setSelectedType] = useState(null);
 
   const [form, setForm] = useState({
     account_type: 'savings',
@@ -33,7 +34,7 @@ export default function FinancialServicesPage() {
     if (storedUser) setUser(JSON.parse(storedUser));
 
     fetch('/api/user/profile', { headers: { 'Authorization': `Bearer ${token}` } })
-      .then(r => r.json()).then(data => { if (data.id) setUser(data); }).catch(() => {});
+      .then(r => r.json()).then(data => { if (data.id) setUser(data); }).catch(() => { });
 
     fetchBanks();
     fetchAccounts();
@@ -41,20 +42,20 @@ export default function FinancialServicesPage() {
 
   const fetchBanks = () => {
     fetch('/api/financial/banks', { headers: { 'Authorization': `Bearer ${token}` } })
-      .then(r => r.json()).then(data => setBanks(data.banks || [])).catch(() => {});
+      .then(r => r.json()).then(data => setBanks(data.banks || [])).catch(() => { });
   };
 
   const fetchAccounts = () => {
     fetch('/api/financial/accounts', { headers: { 'Authorization': `Bearer ${token}` } })
-      .then(r => r.json()).then(data => setAccounts(data.accounts || [])).catch(() => {});
+      .then(r => r.json()).then(data => setAccounts(data.accounts || [])).catch(() => { });
   };
 
   const handleLogout = () => {
     if (token) {
-      fetch('/api/auth/logout', { 
-        method: 'POST', 
-        headers: { 'Authorization': `Bearer ${token}` } 
-      }).catch(() => {});
+      fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).catch(() => { });
     }
     localStorage.removeItem('gp_token');
     localStorage.removeItem('gp_user');
@@ -69,8 +70,9 @@ export default function FinancialServicesPage() {
 
   const selectBank = (bank) => {
     setSelectedBank(bank);
-    setForm({ account_type: 'savings', branch: bank.branches[0] });
-    setShowForm(true);
+    setSelectedBranch(null);
+    setSelectedType(null);
+    setForm({ account_type: 'savings', branch: '' });
     setResult(null);
   };
 
@@ -86,7 +88,7 @@ export default function FinancialServicesPage() {
       const data = await res.json();
       if (res.ok && data.success) {
         setResult(data);
-        setShowForm(false);
+        setSelectedBank(null);
         fetchAccounts();
         setToast({ type: 'success', message: data.message });
       } else {
@@ -99,10 +101,10 @@ export default function FinancialServicesPage() {
   };
 
   const accountTypeLabels = { savings: 'Savings', current: 'Current', fixed_deposit: 'Fixed Deposit' };
-  const accountTypeIcons = { 
-    savings: <Wallet size={20} color="white" />, 
-    current: <PieChart size={20} color="white" />, 
-    fixed_deposit: <Lock size={20} color="white" /> 
+  const accountTypeIcons = {
+    savings: <Wallet size={20} color="white" />,
+    current: <PieChart size={20} color="white" />,
+    fixed_deposit: <Lock size={20} color="white" />
   };
 
   if (!user) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}><div className="spinner" style={{ width: '40px', height: '40px' }}></div></div>;
@@ -248,112 +250,135 @@ export default function FinancialServicesPage() {
           )}
 
           {/* Bank Selection */}
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem' }}>
-            {showForm ? '← Select a Different Bank' : 'Select a Bank to Open an Account'}
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '2rem' }}>
+            Select a Bank to Open an Account
           </h3>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
             {banks.map(bank => (
               <div key={bank.id}
                 onClick={() => selectBank(bank)}
-                style={{
-                  background: selectedBank?.id === bank.id ? `${bank.color}12` : 'var(--gradient-card)',
-                  border: `1px solid ${selectedBank?.id === bank.id ? bank.color + '50' : 'var(--border-color)'}`,
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '1.5rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.25s ease',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-                onMouseOver={e => { if (selectedBank?.id !== bank.id) { e.currentTarget.style.borderColor = 'var(--border-active)'; e.currentTarget.style.transform = 'translateY(-4px)'; } }}
-                onMouseOut={e => { if (selectedBank?.id !== bank.id) { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.transform = 'translateY(0)'; } }}
+                className="bank-card-white"
               >
-                {selectedBank?.id === bank.id && (
-                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: bank.color }}></div>
-                )}
-                <div style={{
-                  height: '48px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: '1rem'
-                }}>
+                <div style={{ height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <img src={bank.logo} alt={bank.name} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
                 </div>
-                <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.25rem' }}>{bank.name}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  SWIFT: {bank.swift} • {bank.branches.length} branches
-                </div>
-                {selectedBank?.id === bank.id && (
-                  <span className="badge badge-active" style={{ marginTop: '0.75rem' }}>Selected</span>
-                )}
+                <div className="bank-name">{bank.name}</div>
               </div>
             ))}
           </div>
 
-          {/* Account Opening Form */}
-          {showForm && selectedBank && (
-            <div className="card" style={{ padding: '2rem', maxWidth: '600px', animation: 'fadeInUp 0.3s ease' }}>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-                Open Account with {selectedBank.name}
-              </h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-                Your Ghana Pass identity will be used for instant KYC verification.
-              </p>
+          {/* Bank Selection Modal */}
+          {selectedBank && (
+            <div className="modal-overlay">
+              <div className="modal-container">
+                <button className="modal-close" onClick={() => setSelectedBank(null)}><X size={20} /></button>
 
-              <form onSubmit={handleOpenAccount}>
-                <div className="form-group">
-                  <label className="form-label">Account Type</label>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
-                    {Object.entries(accountTypeLabels).map(([key, label]) => (
-                      <div key={key}
-                        onClick={() => setForm(f => ({ ...f, account_type: key }))}
-                        style={{
-                          padding: '1rem',
-                          background: form.account_type === key ? 'rgba(212, 168, 67, 0.1)' : 'var(--bg-glass)',
-                          border: `1px solid ${form.account_type === key ? 'var(--gold)' : 'var(--border-color)'}`,
-                          borderRadius: 'var(--radius-md)',
-                          cursor: 'pointer',
-                          textAlign: 'center',
-                          transition: 'all 0.2s ease'
-                        }}
-                      >
-                        <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>{accountTypeIcons[key]}</div>
-                        <div style={{ fontWeight: 600, fontSize: '0.8rem' }}>{label}</div>
+                {/* Left Pane: Branches & Types */}
+                <div className="modal-left">
+                  <div style={{ padding: '2rem 1.5rem 1rem', borderBottom: '1px solid var(--border-color)' }}>
+                    <img src={selectedBank.logo} alt={selectedBank.name} style={{ height: '32px', marginBottom: '1rem' }} />
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800 }}>{selectedBank.name}</h2>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Select a branch to begin</p>
+                  </div>
+
+                  <div className="branch-list">
+                    {selectedBank.branches.map(branch => (
+                      <div key={branch} className="branch-item">
+                        <div
+                          className={`branch-header ${selectedBranch === branch ? 'active' : ''}`}
+                          onClick={() => setSelectedBranch(selectedBranch === branch ? null : branch)}
+                        >
+                          <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{branch} Branch</span>
+                          <Smartphone size={16} style={{ opacity: 0.6 }} />
+                        </div>
+
+                        {selectedBranch === branch && (
+                          <div className="type-menu">
+                            {Object.entries(accountTypeLabels).map(([type, label]) => (
+                              <button
+                                key={type}
+                                className={`type-btn ${selectedType === type ? 'selected' : ''}`}
+                                onClick={() => {
+                                  setSelectedType(type);
+                                  setForm(f => ({ ...f, branch: branch, account_type: type }));
+                                }}
+                              >
+                                {accountTypeIcons[type]} {label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Branch</label>
-                  <select className="form-input" value={form.branch} onChange={e => setForm(f => ({ ...f, branch: e.target.value }))}>
-                    {selectedBank.branches.map(b => <option key={b} value={b}>{b}</option>)}
-                  </select>
-                </div>
+                {/* Right Pane: Form or Info */}
+                <div className="modal-right">
+                  {selectedType ? (
+                    <div style={{ maxWidth: '500px', margin: '0 auto', animation: 'fadeIn 0.4s ease' }}>
+                      <div style={{ marginBottom: '2rem' }}>
+                        <div className="badge badge-verified" style={{ marginBottom: '1rem' }}>KYC VERIFIED</div>
+                        <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>
+                          Open {accountTypeLabels[selectedType]} Account
+                        </h3>
+                        <p style={{ color: 'var(--text-muted)' }}>
+                          Complete your application for the <strong>{selectedBranch}</strong> branch.
+                        </p>
+                      </div>
 
-                <div style={{
-                  background: 'var(--bg-glass)', borderRadius: 'var(--radius-md)', padding: '1rem',
-                  marginBottom: '1.5rem', border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Account Holder</div>
-                  <div style={{ fontWeight: 700, fontSize: '1rem' }}>{user.full_name}</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>{user.ghana_card_number} • {user.phone}</div>
-                </div>
+                      <form onSubmit={handleOpenAccount}>
+                        <div style={{
+                          background: 'var(--bg-glass)',
+                          borderRadius: 'var(--radius-lg)',
+                          padding: '1.5rem',
+                          border: '1px solid var(--border-color)',
+                          marginBottom: '2rem'
+                        }}>
+                          <div style={{ display: 'grid', gap: '1.5rem' }}>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Full Name</label>
+                              <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{user.full_name}</div>
+                            </div>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Ghana Card Number</label>
+                              <div style={{ fontWeight: 600, fontFamily: 'monospace', color: 'var(--gold)' }}>{user.ghana_card_number}</div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Phone Number</label>
+                                <div style={{ fontWeight: 600 }}>{user.phone}</div>
+                              </div>
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Email</label>
+                                <div style={{ fontWeight: 600 }}>{user.email || 'N/A'}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
 
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <button type="button" className="btn btn-secondary" onClick={() => { setShowForm(false); setSelectedBank(null); }} style={{ flex: 1 }}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-green" disabled={loading} style={{ flex: 2 }}>
-                    {loading ? (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div className="spinner" style={{ width: '18px', height: '18px', borderWidth: '2px' }}></div>
-                        Opening Account...
-                      </span>
-                    ) : '🏦 Open Account'}
-                  </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '1rem', background: 'rgba(0,107,63,0.05)', borderRadius: 'var(--radius-md)', marginBottom: '2rem', border: '1px solid rgba(0,107,63,0.1)' }}>
+                          <ShieldCheck size={20} color="var(--green-light)" />
+                          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                            Information verified via National Identification Authority (NIA).
+                          </p>
+                        </div>
+
+                        <button type="submit" className="btn btn-green btn-lg" disabled={loading} style={{ width: '100%', height: '56px', fontSize: '1.1rem' }}>
+                          {loading ? 'Processing Application...' : 'Submit Opening Request'}
+                        </button>
+                      </form>
+                    </div>
+                  ) : (
+                    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
+                      <Landmark size={64} style={{ opacity: 0.1, marginBottom: '1.5rem' }} />
+                      <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'white', marginBottom: '0.5rem' }}>Start Your Application</h3>
+                      <p style={{ maxWidth: '300px' }}>Select a branch and account type from the left panel to begin your account opening process.</p>
+                    </div>
+                  )}
                 </div>
-              </form>
+              </div>
             </div>
           )}
 
@@ -365,29 +390,29 @@ export default function FinancialServicesPage() {
                 {accounts.map(acc => {
                   const bankDetails = banks.find(b => b.code === acc.bank_code);
                   return (
-                  <div key={acc.id} className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{
-                      width: '48px', height: '48px', borderRadius: 'var(--radius-md)',
-                      background: 'var(--bg-glass)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: '4px'
-                    }}>
-                      {bankDetails?.logo ? (
-                        <img src={bankDetails.logo} alt={acc.bank_name} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
-                      ) : '🏛️'}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{acc.bank_name}</div>
-                      <div style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: 'var(--gold)', letterSpacing: '1px' }}>
-                        {acc.account_number}
+                    <div key={acc.id} className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <div style={{
+                        width: '48px', height: '48px', borderRadius: 'var(--radius-md)',
+                        background: 'var(--bg-glass)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: '4px'
+                      }}>
+                        {bankDetails?.logo ? (
+                          <img src={bankDetails.logo} alt={acc.bank_name} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
+                        ) : '🏛️'}
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                        {accountTypeLabels[acc.account_type] || acc.account_type} • {acc.branch} • Opened {new Date(acc.created_at).toLocaleDateString()}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{acc.bank_name}</div>
+                        <div style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: 'var(--gold)', letterSpacing: '1px' }}>
+                          {acc.account_number}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                          {accountTypeLabels[acc.account_type] || acc.account_type} • {acc.branch} • Opened {new Date(acc.created_at).toLocaleDateString()}
+                        </div>
                       </div>
+                      <span className={`badge ${acc.status === 'active' ? 'badge-verified' : 'badge-pending'}`}>
+                        {acc.status?.toUpperCase()}
+                      </span>
                     </div>
-                    <span className={`badge ${acc.status === 'active' ? 'badge-verified' : 'badge-pending'}`}>
-                      {acc.status?.toUpperCase()}
-                    </span>
-                  </div>
                   );
                 })}
               </div>
@@ -396,10 +421,10 @@ export default function FinancialServicesPage() {
 
           {/* Info */}
           <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'var(--bg-glass)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.5rem' }}>🔐 Secure KYC Integration</h3>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.5rem' }}> Secure KYC Integration</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.7 }}>
-              Your verified Ghana Pass identity enables instant KYC (Know Your Customer) compliance. 
-              Partner banks receive only the information you consent to share. All accounts opened through 
+              Your verified Ghana Pass identity enables instant KYC (Know Your Customer) compliance.
+              Partner banks receive only the information you consent to share. All accounts opened through
               Ghana Pass are fully compliant with Bank of Ghana regulations.
             </p>
           </div>

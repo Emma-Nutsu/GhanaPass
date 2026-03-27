@@ -30,7 +30,7 @@ export default function Home() {
       {/* Hero */}
       <section className="hero" style={{ background: '#000', minHeight: '100vh', display: 'flex', alignItems: 'center', padding: '8rem 4rem' }}>
         <div style={{
-          maxWidth: '1440px',
+          maxWidth: '1240px',
           width: '100%', margin: '0 auto', position: 'relative', zIndex: 1
         }}>
 
@@ -39,8 +39,8 @@ export default function Home() {
             {/* Left Column */}
             <div style={{ textAlign: 'left' }}>
               <h1 style={{
-                fontSize: 'clamp(3.0rem, 7vw, 7.0rem)',
-                fontWeight: 700,
+                fontSize: 'clamp(2.50rem, 6vw, 6.5rem)',
+                fontWeight: 600,
                 color: 'white',
                 lineHeight: 1,
                 letterSpacing: '-4px',
@@ -51,7 +51,7 @@ export default function Home() {
               </h1>
               <p style={{
                 color: 'rgba(255,255,255,0.7)',
-                fontSize: '1.4rem',
+                fontSize: '1.2rem',
                 lineHeight: 1.5,
                 maxWidth: '750px',
                 marginBottom: '4rem'
@@ -106,8 +106,8 @@ export default function Home() {
                   src="/qrcode.png"
                   alt="Ghana Pass QR Code"
                   style={{
-                    width: '640px',
-                    height: '640px',
+                    width: '540px',
+                    height: '540px',
                     objectFit: 'contain',
                     position: 'relative',
                     zIndex: 2,
