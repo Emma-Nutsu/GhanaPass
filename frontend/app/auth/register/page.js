@@ -135,20 +135,25 @@ export default function RegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-card" style={{ maxWidth: step === 3 ? '500px' : '460px' }}>
-        <div className="auth-logo">
-          <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div className="logo-icon"><img src="/logos/COA.png" alt="COA" /></div>
-            <h2>Create Your Ghana<span style={{ color: 'var(--gold)' }}>Pass</span></h2>
-          </Link>
-          <p>Setup your national digital identity</p>
-        </div>
+        {/* Logo & Header - only show when not in success state */}
+        {step < 4 && (
+          <div className="auth-logo">
+            <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="logo-icon"><img src="/logos/COA.png" alt="COA" /></div>
+              <h2>Create Your Ghana<span style={{ color: 'var(--gold)' }}>Pass</span></h2>
+            </Link>
+            <p>Setup your national digital identity</p>
+          </div>
+        )}
 
-        {/* Progress steps */}
-        <div className="steps">
-          {[1, 2, 3].map(s => (
-            <div key={s} className={`step ${step === s ? 'active' : ''} ${step > s ? 'completed' : ''}`} />
-          ))}
-        </div>
+        {/* Progress steps - only show when not in success state */}
+        {step < 4 && (
+          <div className="steps">
+            {[1, 2, 3].map(s => (
+              <div key={s} className={`step ${step === s ? 'active' : ''} ${step > s ? 'completed' : ''}`} />
+            ))}
+          </div>
+        )}
 
         {error && (
           <div style={{ padding: '10px 16px', background: 'rgba(206,17,38,0.1)', border: '1px solid rgba(206,17,38,0.3)', borderRadius: 'var(--radius-md)', color: 'var(--red-light)', fontSize: '0.85rem', marginBottom: '1rem' }}>
@@ -325,6 +330,8 @@ export default function RegisterPage() {
           </div>
         )}
 
+        {/* Step 4: Success Message */}
+        {step === 4 && (
           <div className="animate-fade-in" style={{ textAlign: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
               <PartyPopper size={64} color="var(--gold)" />
@@ -343,6 +350,7 @@ export default function RegisterPage() {
               Go to Dashboard <ArrowRight size={18} />
             </Link>
           </div>
+        )}
 
         {step < 4 && (
           <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>

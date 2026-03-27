@@ -332,13 +332,24 @@ export default function LoginPage() {
               <form onSubmit={handlePasswordLogin}>
                 <div className="form-group">
                   <label className="form-label">Ghana Card Number</label>
-                  <GhanaCardInput value={form.ghana_card_number}
-                    onChange={val => setForm({ ...form, ghana_card_number: val })} required />
+                  <GhanaCardInput 
+                    name="ghana_card_number"
+                    value={form.ghana_card_number}
+                    onChange={val => setForm({ ...form, ghana_card_number: val })} 
+                    required 
+                  />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Password</label>
-                  <input className="form-input" type="password" placeholder="Enter your password" value={form.password}
-                    onChange={e => setForm({ ...form, password: e.target.value })} required />
+                  <input 
+                    className="form-input" 
+                    type="password" 
+                    name="password"
+                    placeholder="Enter your password" 
+                    value={form.password}
+                    onChange={e => setForm({ ...form, password: e.target.value })} 
+                    required 
+                  />
                 </div>
                 <button className="btn btn-primary btn-full btn-lg" type="submit" disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                   {loading ? <><div className="spinner"></div> Verifying...</> : <>Continue <ArrowRight size={18} /></>}
