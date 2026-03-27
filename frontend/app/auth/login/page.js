@@ -7,6 +7,7 @@ import {
   Fingerprint, ArrowRight, ArrowLeft, Camera,
   ShieldCheck, AlertCircle, RefreshCw, Smartphone as PhoneIcon
 } from 'lucide-react';
+import { useRef, useEffect } from 'react';
 import GhanaCardInput from '../../../components/GhanaCardInput';
 
 export default function LoginPage() {
@@ -20,10 +21,13 @@ export default function LoginPage() {
   const [userName, setUserName] = useState('');
   const [otpHint, setOtpHint] = useState('');
   const [maskedPhone, setMaskedPhone] = useState('');
+  const [stream, setStream] = useState(null);
+  const videoRef = useRef(null);
 
   const [form, setForm] = useState({ ghana_card_number: 'GHA-', password: '', otp: '' });
 
   const completeLogin = (data) => {
+    stopCamera();
     localStorage.setItem('gp_token', data.tokens.accessToken);
     localStorage.setItem('gp_user', JSON.stringify(data.user));
     if (data.user.role === 'admin') {
@@ -58,6 +62,48 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  const startCamera = async () => {
+    console.log("Attempting to start camera...");
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Camera API not supported in this browser/context.");
+      }
+      const s = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } 
+      });
+      console.log("Camera stream obtained:", s.id);
+      setStream(s);
+    } catch (err) {
+      console.error("Camera error:", err);
+      setError("Unable to access camera: " + (err.message || "Unknown error"));
+    }
+  };
+
+  const stopCamera = () => {
+    if (stream) {
+      console.log("Stopping camera stream...");
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Current loginStep:", loginStep);
+    if (loginStep === 'face_verify') {
+      startCamera();
+    } else {
+      stopCamera();
+    }
+    return () => stopCamera();
+  }, [loginStep]);
+
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      console.log("Attaching stream to video element...");
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
 
   // Face verification step
   const startFaceVerify = () => {
@@ -204,14 +250,35 @@ export default function LoginPage() {
             </div>
 
             <div className="face-capture">
-              <div className={`face-frame ${scanning ? 'scanning' : ''}`}>
-                {scanning ? (
-                  <div style={{ textAlign: 'center' }}>
-                    <div className="spinner" style={{ width: '40px', height: '40px', margin: '0 auto 12px', borderWidth: '3px' }}></div>
-                    <div style={{ color: 'var(--gold)', fontSize: '0.85rem', fontWeight: 600 }}>Verifying Face...</div>
+              <div className={`face-frame ${scanning ? 'scanning' : ''}`} style={{ position: 'relative', overflow: 'hidden' }}>
+                {/* Scanner Overlay */}
+                {scanning && (
+                  <div style={{ position: 'absolute', inset: 0, zIndex: 10, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                    <div className="spinner" style={{ width: '50px', height: '50px', marginBottom: '12px', borderWidth: '3px', borderColor: 'var(--gold) transparent var(--gold) transparent' }}></div>
+                    <div style={{ color: 'var(--gold)', fontSize: '0.9rem', fontWeight: 700, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>VERIFYING...</div>
                   </div>
-                ) : (
-                  <div className="placeholder-icon"><User size={64} color="var(--text-muted)" /></div>
+                )}
+                
+                {/* Live Video Feed */}
+                <video 
+                  ref={videoRef} 
+                  autoPlay 
+                  playsInline 
+                  muted 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover', 
+                    transform: 'scaleX(-1)',
+                    display: stream ? 'block' : 'none' 
+                  }} 
+                />
+
+                {/* Initial Placeholder (Shown until stream connects) */}
+                {!stream && (
+                  <div className="placeholder-icon">
+                    <User size={80} color="rgba(255,255,255,0.15)" strokeWidth={1} />
+                  </div>
                 )}
               </div>
               <div className="face-instructions">

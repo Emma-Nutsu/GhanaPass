@@ -238,10 +238,7 @@ function initializeDatabase() {
   `);
 
   // Seed Ghana Card Registry (dummy NIA database)
-  const registryExists = db.prepare('SELECT card_number FROM ghana_card_registry LIMIT 1').get();
-  if (!registryExists) {
-    seedRegistry();
-  }
+  seedRegistry();
 
   // Seed default admin user and sample data
   const adminExists = db.prepare('SELECT id FROM users WHERE role = ?').get('admin');
@@ -267,6 +264,10 @@ function seedRegistry() {
     { card: 'GHA-334455667-2', name: 'Fiifi Mensah', dob: '2000-01-30', gender: 'Male', region: 'Central', address: '7 Elmina Beach Rd, Elmina', phone: '+233550000012' },
     { card: 'GHA-445566778-3', name: 'Afua Sarpong', dob: '1996-07-17', gender: 'Female', region: 'Western', address: '19 Sekondi Rd, Sekondi', phone: '+233200000013' },
     { card: 'GHA-556677889-4', name: 'Yeboah Mensah', dob: '1987-11-22', gender: 'Male', region: 'Upper West', address: '4 Wa Central, Wa', phone: '+233240000014' },
+    { card: 'GHA-667788990-5', name: 'David Attipoe', dob: '1992-05-14', gender: 'Male', region: 'Volta', address: '14 Keta Rd, Ho', phone: '+233240000015' },
+    { card: 'GHA-778899001-6', name: 'Gordon Nana Amoako', dob: '1985-11-30', gender: 'Male', region: 'Eastern', address: '22 Akropong St, Akropong', phone: '+233200000016' },
+    { card: 'GHA-889900112-7', name: 'John Fynn Addison', dob: '1990-03-22', gender: 'Male', region: 'Central', address: '5 Fynn St, Elmina', phone: '+233270000017' },
+    { card: 'GHA-990011223-8', name: 'Ekow Nyanka', dob: '1994-08-09', gender: 'Male', region: 'Western', address: '31 Essikado Rd, Sekondi', phone: '+233540000018' },
   ];
 
   const stmt = db.prepare(`INSERT OR IGNORE INTO ghana_card_registry (card_number, full_name, date_of_birth, gender, region, address, phone) VALUES (?, ?, ?, ?, ?, ?, ?)`);
