@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRA Tax Portal — Dashboard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: #1e3a5f;
+      color: white;
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header h1 { font-size: 1.15rem; font-weight: 700; }
+    .header .subtitle { font-size: 0.7rem; opacity: 0.7; }
+
+    .header-right { display: flex; align-items: center; gap: 1.5rem; }
+    .header-right .user-info { text-align: right; font-size: 0.85rem; }
+    .header-right .user-name { font-weight: 600; }
+    .header-right .user-role { opacity: 0.7; font-size: 0.75rem; }
+
+    .avatar {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #D4A843, #F0D988);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: #1A1A2E; font-size: 0.95rem;
+    }
+
+    .logout-btn {
+      padding: 6px 16px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* Layout */
+    .layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: calc(100vh - 64px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: white;
+      border-right: 1px solid #e2e8f0;
+      padding: 1.5rem 0;
+    }
+
+    .sidebar-section { padding: 0 1rem; margin-bottom: 1.5rem; }
+    .sidebar-title {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; color: #94a3b8; padding: 0 12px; margin-bottom: 8px;
+    }
+
+    .sidebar-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; color: #475569; text-decoration: none;
+      border-radius: 8px; font-size: 0.9rem; font-weight: 500;
+      transition: all 0.15s; cursor: pointer;
+    }
+    .sidebar-link:hover { background: #f1f5f9; color: #1e293b; }
+    .sidebar-link.active { background: #eff6ff; color: #1e3a5f; font-weight: 600; }
+    .sidebar-link .icon { width: 22px; text-align: center; font-size: 1.1rem; }
+
+    .ghana-pass-badge {
+      margin: 0 1rem;
+      padding: 12px;
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #166534;
+    }
+    .ghana-pass-badge .gp-label { font-weight: 700; margin-bottom: 2px; }
+    .ghana-pass-badge .gp-status { font-size: 0.75rem; }
+
+    /* Main Content */
+    .main { padding: 2rem; }
+
+    .welcome-banner {
+      background: linear-gradient(135deg, #1e3a5f, #2d5a8e);
+      color: white;
+      padding: 2rem;
+      border-radius: 16px;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .welcome-banner::after {
+      content: '🏛️';
+      position: absolute;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 4rem;
+      opacity: 0.15;
+    }
+    .welcome-banner h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .welcome-banner p { opacity: 0.8; font-size: 0.95rem; }
+    .welcome-banner .tax-year {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 4px 14px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s;
+    }
+    .stat-card:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.06); transform: translateY(-2px); }
+    .stat-icon { font-size: 1.8rem; margin-bottom: 0.75rem; }
+    .stat-value { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; }
+    .stat-label { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+    .stat-card.green .stat-value { color: #059669; }
+    .stat-card.blue .stat-value { color: #2563eb; }
+    .stat-card.amber .stat-value { color: #d97706; }
+    .stat-card.red .stat-value { color: #dc2626; }
+
+    /* Content Grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .panel-header h3 { font-size: 1rem; font-weight: 700; }
+    .panel-header .view-all {
+      font-size: 0.8rem; color: #2563eb; text-decoration: none;
+      font-weight: 600; cursor: pointer;
+    }
+    .panel-header .view-all:hover { text-decoration: underline; }
+
+    .panel-body { padding: 1rem 1.5rem; }
+
+    /* Table */
+    .filing-table { width: 100%; border-collapse: collapse; }
+    .filing-table th {
+      text-align: left; padding: 10px 0; font-size: 0.75rem;
+      font-weight: 600; color: #94a3b8; text-transform: uppercase;
+      letter-spacing: 0.5px; border-bottom: 1px solid #f1f5f9;
+    }
+    .filing-table td {
+      padding: 12px 0; font-size: 0.88rem; border-bottom: 1px solid #f8fafc;
+    }
+    .filing-table tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-flex; padding: 3px 10px; border-radius: 9999px;
+      font-size: 0.72rem; font-weight: 600;
+    }
+    .badge-green { background: #dcfce7; color: #059669; }
+    .badge-amber { background: #fef3c7; color: #d97706; }
+    .badge-blue { background: #dbeafe; color: #2563eb; }
+    .badge-red { background: #fee2e2; color: #dc2626; }
+
+    /* Quick Actions */
+    .action-btn {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; padding: 14px 16px;
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      border-radius: 10px; font-family: inherit;
+      font-size: 0.9rem; font-weight: 500; color: #1e293b;
+      cursor: pointer; transition: all 0.2s;
+      margin-bottom: 8px; text-align: left;
+    }
+    .action-btn:last-child { margin-bottom: 0; }
+    .action-btn:hover { background: #eff6ff; border-color: #bfdbfe; }
+    .action-btn .action-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .action-btn .action-icon.blue { background: #dbeafe; }
+    .action-btn .action-icon.green { background: #dcfce7; }
+    .action-btn .action-icon.amber { background: #fef3c7; }
+    .action-btn .action-icon.purple { background: #f3e8ff; }
+
+    .action-label { font-weight: 600; font-size: 0.88rem; }
+    .action-desc { font-size: 0.75rem; color: #64748b; }
+
+    /* Notification */
+    .notification {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.85rem;
+    }
+    .notification:last-child { border-bottom: none; }
+    .notification .notif-icon {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .notification .notif-text { color: #475569; line-height: 1.5; }
+    .notification .notif-time { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+
+    /* Footer */
+    .footer {
+      text-align: center; padding: 1.5rem; color: #94a3b8;
+      font-size: 0.78rem; border-top: 1px solid #e2e8f0;
+      background: white;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .content-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div>
+        <h1>🏛️ Ghana Revenue Authority</h1>
+        <div class="subtitle">Tax Filing Portal</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="user-info">
+        <div class="user-name" id="headerName">Loading...</div>
+        <div class="user-role" id="headerCard">—</div>
+      </div>
+      <div class="avatar" id="headerAvatar">?</div>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Main</div>
+        <a class="sidebar-link active"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-link"><span class="icon">📝</span> File Returns</a>
+        <a class="sidebar-link"><span class="icon">💳</span> Payments</a>
+        <a class="sidebar-link"><span class="icon">📄</span> Tax Certificates</a>
+        <a class="sidebar-link"><span class="icon">📋</span> Assessments</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Tools</div>
+        <a class="sidebar-link"><span class="icon">🔢</span> Tax Calculator</a>
+        <a class="sidebar-link"><span class="icon">📅</span> Deadlines</a>
+        <a class="sidebar-link"><span class="icon">📁</span> Documents</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Support</div>
+        <a class="sidebar-link"><span class="icon">❓</span> Help Center</a>
+        <a class="sidebar-link"><span class="icon">💬</span> Contact GRA</a>
+      </div>
+
+      <div style="margin-top: auto; padding-top: 1rem;">
+        <div class="ghana-pass-badge">
+          <div class="gp-label">★ Ghana Pass Verified</div>
+          <div class="gp-status">Identity Confirmed</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <h2 id="welcomeName">Welcome back!</h2>
+        <p>Manage your taxes, file returns, and stay compliant with GRA — all in one place.</p>
+        <span class="tax-year">📅 Tax Year 2025/2026</span>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value">GH₵ 0.00</div>
+          <div class="stat-label">Outstanding Balance</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">📊</div>
+          <div class="stat-value">3</div>
+          <div class="stat-label">Returns Filed</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-icon">⏰</div>
+          <div class="stat-value">Apr 30</div>
+          <div class="stat-label">Next Filing Deadline</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">🧾</div>
+          <div class="stat-value">GH₵ 12,450</div>
+          <div class="stat-label">Total Tax Paid (2025)</div>
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="content-grid">
+        <!-- Recent Filings -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>📋 Recent Tax Filings</h3>
+            <a class="view-all">View All →</a>
+          </div>
+          <div class="panel-body">
+            <table class="filing-table">
+              <thead>
+                <tr>
+                  <th>Tax Type</th>
+                  <th>Period</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Income Tax</strong></td>
+                  <td>Q4 2025</td>
+                  <td>GH₵ 4,200.00</td>
+                  <td><span class="badge badge-green">Paid</span></td>
+                </tr>
+                <tr>
+                  <td><strong>VAT Return</strong></td>
+                  <td>Dec 2025</td>
+                  <td>GH₵ 1,850.00</td>
+                  <td><span class="badge badge-green">Paid</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Income Tax</strong></td>
+                  <td>Q3 2025</td>
+                  <td>GH₵ 3,900.00</td>
+                  <td><span class="badge badge-green">Paid</span></td>
+                </tr>
+                <tr>
+                  <td><strong>PAYE</strong></td>
+                  <td>Jan 2026</td>
+                  <td>GH₵ 2,500.00</td>
+                  <td><span class="badge badge-amber">Pending</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Income Tax</strong></td>
+                  <td>Q1 2026</td>
+                  <td>—</td>
+                  <td><span class="badge badge-blue">Due Apr 30</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div>
+          <!-- Quick Actions -->
+          <div class="panel" style="margin-bottom: 1.5rem;">
+            <div class="panel-header">
+              <h3>⚡ Quick Actions</h3>
+            </div>
+            <div class="panel-body">
+              <button class="action-btn">
+                <div class="action-icon blue">📝</div>
+                <div>
+                  <div class="action-label">File Tax Return</div>
+                  <div class="action-desc">Submit your Q1 2026 return</div>
+                </div>
+              </button>
+              <button class="action-btn">
+                <div class="action-icon green">💳</div>
+                <div>
+                  <div class="action-label">Make Payment</div>
+                  <div class="action-desc">Pay outstanding taxes</div>
+                </div>
+              </button>
+              <button class="action-btn">
+                <div class="action-icon amber">📄</div>
+                <div>
+                  <div class="action-label">Request Tax Clearance</div>
+                  <div class="action-desc">Get your clearance certificate</div>
+                </div>
+              </button>
+              <button class="action-btn">
+                <div class="action-icon purple">📁</div>
+                <div>
+                  <div class="action-label">Upload Documents</div>
+                  <div class="action-desc">Submit supporting documents</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Notifications -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3>🔔 Notifications</h3>
+            </div>
+            <div class="panel-body">
+              <div class="notification">
+                <div class="notif-icon" style="background: #dbeafe;">📢</div>
+                <div>
+                  <div class="notif-text"><strong>Q1 2026 filing</strong> — Your income tax return is due by April 30, 2026.</div>
+                  <div class="notif-time">2 days ago</div>
+                </div>
+              </div>
+              <div class="notification">
+                <div class="notif-icon" style="background: #dcfce7;">✅</div>
+                <div>
+                  <div class="notif-text"><strong>Payment confirmed</strong> — GH₵ 1,850.00 for VAT Return (Dec 2025) received.</div>
+                  <div class="notif-time">1 week ago</div>
+                </div>
+              </div>
+              <div class="notification">
+                <div class="notif-icon" style="background: #fef3c7;">⚠️</div>
+                <div>
+                  <div class="notif-text"><strong>PAYE pending</strong> — Your January 2026 PAYE submission awaits payment.</div>
+                  <div class="notif-time">2 weeks ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    This is a demo application showing Ghana Pass SSO integration · Not an actual GRA website · Authenticated via Ghana Pass OAuth 2.0
+  </footer>
+
+  <script>
+    // Check if user is authenticated
+    const userData = sessionStorage.getItem('ghanaPassUser');
+    const tokenData = sessionStorage.getItem('ghanaPassToken');
+
+    if (!userData || !tokenData) {
+      // Not authenticated, redirect back to login
+      window.location.href = 'index.html';
+    } else {
+      const user = JSON.parse(userData);
+      
+      // Populate user info
+      document.getElementById('headerName').textContent = user.name || user.full_name || 'User';
+      document.getElementById('headerCard').textContent = user.ghana_card_number || '';
+      document.getElementById('headerAvatar').textContent = (user.name || user.full_name || 'U').charAt(0).toUpperCase();
+      document.getElementById('welcomeName').textContent = 'Welcome back, ' + (user.name || user.full_name || 'User') + '!';
+    }
+
+    function logout() {
+      sessionStorage.removeItem('ghanaPassUser');
+      sessionStorage.removeItem('ghanaPassToken');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
